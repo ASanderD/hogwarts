@@ -6,21 +6,29 @@ import java.util.Objects;
 
 @Entity
 public class Student {
+
     @Id
+
     @SequenceGenerator(name = "student_seq",
-    sequenceName = "student_sequence",allocationSize = 20)
-    @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "student_seq")
+            sequenceName = "student_sequence", allocationSize = 20)
+
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
+
+
     private Long id;
     private String name;
     private int age;
 
-    public Student(Long id, String name, int age) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
+    @ManyToOne
+    @JoinColumn(name = "faculty_id")
+    private Faculty faculty;
+
+    public Faculty getFaculty() {
+        return faculty;
     }
 
-    public Student() {
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
     public Long getId() {
