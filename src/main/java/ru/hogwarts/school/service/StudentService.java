@@ -42,16 +42,19 @@ public class StudentService {
                 .map(oldStudent -> {
                     oldStudent.setName(student.getName());
                     oldStudent.setAge(student.getAge());
+                    oldStudent.setFaculty(student.getFaculty());
                     return studentRepository.save(oldStudent);
                 })
                 .orElseThrow(() -> new StudentNotFoundException());
     }
 
-    public void deleteStudent(long id) {
-        if (findStudent(id) == null) {
-            throw new FacultyNotFoundException();
-        }
-        studentRepository.deleteById(id);
+    public Student deleteStudent(long id) {
+        return studentRepository.findById(id)
+                .map(student -> {
+                    studentRepository.deleteById(id);
+                    return student;
+                })
+                .orElseThrow(() -> new StudentNotFoundException());
     }
 
     public Collection<Student> getAllStudents() {
@@ -64,8 +67,7 @@ public class StudentService {
     }
 
     public List<Student> getStudentsByAge(int age) {
-        return studentRepository.findAll().stream()
-                .filter(student -> student.getAge() == age)
+        return studentRepository.findByAge(age).stream()
                 .collect(Collectors.toList());
     }
 
