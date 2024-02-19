@@ -22,11 +22,6 @@ public class FacultyController {
         return facultyService.get(id);
     }
 
-    @GetMapping(params = "name")
-    public Collection<Faculty> findByName(@RequestParam String name) {
-        return facultyService.findByName(name);
-    }
-
     @GetMapping
     public Collection<Faculty> getAllFaculties() {
         return facultyService.getAllFaculties();
@@ -47,9 +42,14 @@ public class FacultyController {
         return facultyService.delete(id);
     }
 
-    @GetMapping("/find-by-color")
-    public List<Faculty> getFacultyByColor(@RequestParam String color) {
+    @GetMapping(params = "color")
+    public List<Faculty> getFacultyByColor(@RequestParam (required = false) String color) {
         return facultyService.getFacultyByColor(color);
+    }
+
+    @GetMapping(params = "nameOrColor")
+    public List<Faculty> findByNameOrColor(@RequestParam (required = false) String nameOrColor) {
+        return facultyService.findByNameOrColor(nameOrColor);
     }
 
     @GetMapping("/{id}/students")

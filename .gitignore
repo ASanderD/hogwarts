@@ -13,6 +13,12 @@ target/
 *.ipr
 /.idea/
 *.idea
+.idea
+</>encodings.xml
+</>misc.xml
+
+</>uiDesigner.xml
+</>vcs.xml
 
 ### Eclipse ###
 .apt_generated

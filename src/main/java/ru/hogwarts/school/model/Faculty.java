@@ -10,18 +10,10 @@ public class Faculty {
     @SequenceGenerator(name = "faculty_seq",
             sequenceName = "faculty_sequence", allocationSize = 15)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "faculty_seq")
+
     private Long id;
     private String name;
     private String color;
-
-    public Faculty(Long id, String name, String color) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-    }
-
-    public Faculty() {
-    }
 
     public Long getId() {
         return id;

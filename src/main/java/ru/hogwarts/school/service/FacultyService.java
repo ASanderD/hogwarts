@@ -62,13 +62,12 @@ public class FacultyService {
     }
 
     public List<Faculty> getFacultyByColor(String color) {
-        return facultyRepository.findAll().stream()
-                .filter(faculty -> faculty.getColor().equals(color))
+        return facultyRepository.findAllByColor(color).stream()
                 .collect(Collectors.toList());
     }
 
-    public Collection<Faculty> findByName(String name) {
-        return facultyRepository.findByNameIgnoreCase(name);
+    public List<Faculty> findByNameOrColor(String nameOrColor) {
+        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor,nameOrColor);
     }
 
     public List<Student> findStudentsByFacultyId(long id) {
