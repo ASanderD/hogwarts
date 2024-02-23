@@ -1,8 +1,9 @@
 package ru.hogwarts.school.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.entity.Faculty;
+import ru.hogwarts.school.entity.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -22,13 +23,14 @@ public class StudentController {
         return studentService.findStudent(id);
     }
 
+    @Operation(summary = "Получить всех студентов")
     @GetMapping
     public Collection<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
-
+    @Operation(summary = "Получить студентов, входящих в определенный интервал по возрасту")
     @GetMapping(params = {"min", "max"})
-    public Collection<Student> findByAgeBetween(@RequestParam(required = false) int min, @RequestParam(required = false) int max) {
+    public Collection<Student> findByAgeBetween(@RequestParam  (required = false) int min, @RequestParam (required = false) int max) {
         return studentService.findByAgeBetween(min, max);
     }
 
@@ -46,7 +48,7 @@ public class StudentController {
     public Student deleteStudent(@PathVariable Long id) {
         return studentService.deleteStudent(id);
     }
-
+    @Operation(summary = "Получить студентов определенного возраста")
     @GetMapping(params = "age")
     public List<Student> getStudentsByAge(@RequestParam(required = false) int age) {
         return studentService.getStudentsByAge(age);

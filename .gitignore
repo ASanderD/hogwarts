@@ -11,14 +11,12 @@ target/
 *.iws
 *.iml
 *.ipr
-/.idea/
 *.idea
 .idea
-</>encodings.xml
-</>misc.xml
-
-</>uiDesigner.xml
-</>vcs.xml
+encodings.xml
+misc.xml
+uiDesigner.xml
+vcs.xml
 
 ### Eclipse ###
 .apt_generated
