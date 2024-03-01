@@ -23,12 +23,6 @@ public class FacultyService {
 
     public Faculty addFaculty(Faculty faculty) {
         faculty.setId(null);
-//        if (faculty != null && faculty.getId() != null) {
-//            Faculty facultyDb = facultyRepository.findById((faculty.getId()))
-//                    .orElseThrow(() -> new FacultyNotFoundException());
-//            student.setFaculty(facultyDb);
-//        }
-
         return facultyRepository.save(faculty);
     }
 
