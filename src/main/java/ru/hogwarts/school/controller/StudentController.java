@@ -48,6 +48,7 @@ public class StudentController {
     public Student deleteStudent(@PathVariable Long id) {
         return studentService.deleteStudent(id);
     }
+
     @Operation(summary = "Получить студентов определенного возраста")
     @GetMapping(params = "age")
     public List<Student> getStudentsByAge(@RequestParam(required = false) int age) {

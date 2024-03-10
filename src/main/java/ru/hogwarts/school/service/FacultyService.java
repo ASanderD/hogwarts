@@ -39,7 +39,7 @@ public class FacultyService {
     public Faculty delete(long id) {
         return facultyRepository.findById(id)
                 .map(faculty -> {
-                    facultyRepository.delete(faculty);
+                    facultyRepository.deleteById(id);
                     return faculty;
                 })
                 .orElseThrow(() -> new FacultyNotFoundException());
