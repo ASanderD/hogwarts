@@ -38,8 +38,7 @@ class StudentControllerWebMvcTest {
     private FacultyRepository facultyRepository;
     @MockBean
     private StudentRepository studentRepository;
-    //    @SpyBean
-//    private FacultyService facultyService;
+
     @SpyBean
     private StudentService studentService;
 
@@ -123,6 +122,7 @@ class StudentControllerWebMvcTest {
 
         when(studentRepository.save(any(Student.class))).thenReturn(createStudentForTests());
         when(studentRepository.findById(any())).thenReturn(Optional.of(createStudentForTests()));
+        when(facultyRepository.findById(any())).thenReturn(Optional.of(createStudentForTests().getFaculty()));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/student")
                 .contentType(MediaType.APPLICATION_JSON)

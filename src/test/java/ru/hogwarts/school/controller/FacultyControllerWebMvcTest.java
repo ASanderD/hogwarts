@@ -283,7 +283,7 @@ class FacultyControllerWebMvcTest {
     }
 
     @Test
-    void findByNameOrColor() throws Exception { // Требуется помощь
+    void findByNameOrColor() throws Exception {
         String color = "Зелёный";
         String name = "Слизерин";
 
@@ -316,7 +316,7 @@ class FacultyControllerWebMvcTest {
         when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(any(), any())).thenReturn(facultiesOfColor, facultiesOfName);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/faculty")
-                .param("color", colorOfSlizerin)
+                .param("nameOrColor", colorOfSlizerin)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(result -> {
             MockHttpServletResponse response = result.getResponse();
@@ -330,7 +330,7 @@ class FacultyControllerWebMvcTest {
     }
 
     @Test
-    void findStudentsOfFaculty() throws Exception { // Почему-то не работает, FacultyNotFoundException, видимо в запрос нужно что-то добавить или факультеты замокать
+    void findStudentsOfFaculty() throws Exception {
         long id = 1L;
         final long idOfRavenclaw = 2L;
         final String nameOfRavenclaw = "Когтевран";
@@ -375,8 +375,8 @@ class FacultyControllerWebMvcTest {
         List<Student> expected = students.stream()
                 .filter(student -> student.getFaculty().getId() == id)
                 .toList();
-        System.out.println(expected);
         when(studentRepository.findByFaculty_Id(eq(id))).thenReturn(expected);
+        when(facultyRepository.findById(any())).thenReturn(Optional.of(drakoMalfoy.getFaculty()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/faculty/{id}/students", id)
                 .contentType(MediaType.APPLICATION_JSON)
