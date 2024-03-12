@@ -204,15 +204,20 @@ class StudentControllerWebMvcTest {
         ).andExpect(result -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value()));
     }
 
-    //
-//    @Test
-//    void deleteStudent() {
-//        long id = 2L;
-//        restTemplate.delete("http://localhost:" + port + "/student/" + id, String.class);
-//        final ResponseEntity<Student> response = restTemplate.getForEntity("http://localhost:" + port + "/student/" + id, Student.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//    }
-//
+    @Test
+    void deleteStudent() throws Exception {
+        final long id = 1L;
+
+        when(studentRepository.findById(any())).thenReturn(Optional.of(createStudentForTests()));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/student/{id}", id)
+                )
+                .andExpect(result ->
+                        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()));
+    }
+
+
     @Test
     void getStudentsByAge() throws Exception {
         int age = 23;
@@ -252,7 +257,7 @@ class StudentControllerWebMvcTest {
         harryPotter.setFaculty(griffindor);
 
 
-        when(studentRepository.findById(anyLong())).thenReturn(Optional.of(harryPotter));
+        when(studentRepository.findById(anyLong())).thenReturn(Optional.of(createStudentForTests()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/student/{id}/faculty",id)
                 .contentType(MediaType.APPLICATION_JSON)
