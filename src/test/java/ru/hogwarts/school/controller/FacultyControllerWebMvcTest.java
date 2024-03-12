@@ -211,35 +211,26 @@ class FacultyControllerWebMvcTest {
         });
     }
 
-    // Требуется помощь, не понимаю, что с delete делать, прошу объяснить
-    //    @Test
-//    void delete() throws Exception {
-//        final long id = 1L;
-//        final String name = "Когтевран";
-//        final String color = "Пурпурный";
-//
-//        Faculty faculty = new Faculty();
-//        faculty.setId(id);
-//        faculty.setName(name);
-//        faculty.setColor(color);
-//
-//        when(facultyRepository.save(any())).thenReturn(faculty);
-//        doNothing().when(facultyRepository).deleteById(any());
-//
-////        service.deleteOneStudent(getRandomInt());
-////        verify(repository, times(1)).deleteById(anyInt());
-////        verifyNoMoreInteractions(repository);
-//
-//
-//        mockMvc.perform(MockMvcRequestBuilders
-//                        .delete("/faculty/{id}", id)
-//
-//                )
-//                .andExpect(
-//                        verifyNoMoreInteractions(faculty));
-//
-//    }
-//
+    @Test
+    void delete() throws Exception {
+        final long id = 1L;
+        final String name = "Когтевран";
+        final String color = "Пурпурный";
+
+        Faculty faculty = new Faculty();
+        faculty.setId(id);
+        faculty.setName(name);
+        faculty.setColor(color);
+
+        when(facultyRepository.findById(any())).thenReturn(Optional.of(faculty));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/faculty/{id}", id)
+                )
+                .andExpect(result ->
+                        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()));
+    }
+
     @Test
     void getFacultyByColor() throws Exception {
         final long idOfRavenclaw = 4L;
