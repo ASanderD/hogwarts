@@ -1,82 +1,102 @@
 package ru.hogwarts.school.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ru.hogwarts.school.dto.AvatarDto;
 import ru.hogwarts.school.entity.Avatar;
 import ru.hogwarts.school.entity.Student;
+import ru.hogwarts.school.exceptions.AvatarNotFoundException;
+import ru.hogwarts.school.exceptions.AvatarProcessingException;
+import ru.hogwarts.school.exceptions.StudentNotFoundException;
+import ru.hogwarts.school.mapper.AvatarMapper;
 import ru.hogwarts.school.repositories.AvatarRepository;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import ru.hogwarts.school.repositories.StudentRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class AvatarService {
-    @Value("avatars")
-    private String avatarsDir;
+
+    private final Path pathToAvatarsDir;
     private final AvatarRepository avatarRepository;
-    private final StudentService studentService;
+    private final StudentRepository studentRepository;
+    private final AvatarMapper avatarMapper;
 
-    public AvatarService(AvatarRepository avatarRepository, StudentService studentService) {
+    public AvatarService(AvatarRepository avatarRepository,
+                         StudentRepository studentRepository,
+                         AvatarMapper avatarMapper,
+                         @Value("${application.path-to-avatars-dir}") String pathToAvatarsDir) {
         this.avatarRepository = avatarRepository;
-        this.studentService = studentService;
+        this.studentRepository = studentRepository;
+        this.avatarMapper = avatarMapper;
+        this.pathToAvatarsDir = Paths.get(pathToAvatarsDir);
     }
 
-    public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        Student student = studentService.findStudent(studentId);
-        Path filePath = Path.of(avatarsDir, student + "." + getExtension(avatarFile.getOriginalFilename()));
-        Files.createDirectories(filePath.getParent());
-        Files.deleteIfExists(filePath);
-        try (InputStream is = avatarFile.getInputStream();
-             OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
-        ) {
-            bis.transferTo(bos);
-        }
-        Avatar avatar = findAvatar(studentId);
-        avatar.setStudent(student);
-        avatar.setFilePath(filePath.toString());
-        avatar.setFileSize(avatarFile.getSize());
-        avatar.setMediaType(avatarFile.getContentType());
-        avatar.setData(avatarFile.getBytes());
-        avatar.setPreview(generateImagePreview(filePath));
-
-        avatarRepository.save(avatar);
-    }
-
-    public Avatar findAvatar(Long studentId) {
-        return avatarRepository.findByStudentId(studentId)
-                .orElse(new Avatar());
-
-    }
-
-    private byte[] generateImagePreview(Path filePath) throws IOException {
-        try (InputStream is = Files.newInputStream(filePath);
-             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            BufferedImage image = ImageIO.read(bis);
-
-            int height = image.getHeight() / (image.getWidth() / 100);
-            BufferedImage preview = new BufferedImage(100, height, image.getType());
-            Graphics2D graphics = preview.createGraphics();
-            graphics.drawImage(image, 0, 0, 100, height, null);
-            graphics.dispose();
-
-            ImageIO.write(preview, getExtension(filePath.getFileName().toString()), baos);
-            return baos.toByteArray();
+    @PostConstruct
+    public void init() {
+        try {
+            if (!Files.exists(pathToAvatarsDir) || !Files.isDirectory(pathToAvatarsDir)) {
+                Files.createDirectories(pathToAvatarsDir);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException();
         }
     }
 
-    public String getExtension(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    public void uploadAvatar(long studentId, MultipartFile avatarFile) {
+        try {
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new StudentNotFoundException());
+            byte[] data = avatarFile.getBytes();
+            String extension = StringUtils.getFilenameExtension(avatarFile.getOriginalFilename());
+            String fileName = String.format("%s.%s", UUID.randomUUID(), extension);
+            Path path = pathToAvatarsDir.resolve(fileName);
+            Files.write(path, data);
+
+            Avatar avatar = new Avatar();
+            avatar.setStudent(student);
+            avatar.setData(data);
+            avatar.setFileSize(data.length);
+            avatar.setMediaType(avatarFile.getContentType());
+            avatar.setFilePath(path.toString());
+            avatarRepository.save(avatar);
+        } catch (IOException e) {
+            throw new AvatarProcessingException();
+        }
+    }
+
+    public Pair<byte[], String> getAvatarFromDb(long studentId) {
+        Avatar avatar = avatarRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new AvatarNotFoundException());
+        return Pair.of(avatar.getData(), avatar.getMediaType());
+    }
+
+    public Pair<byte[], String> getAvatarFromFs(long studentId) {
+        try {
+            Avatar avatar = avatarRepository.findByStudentId(studentId)
+                    .orElseThrow(() -> new AvatarNotFoundException());
+            byte[] data = Files.readAllBytes(Paths.get(avatar.getFilePath()));
+            return Pair.of(avatar.getData(), avatar.getMediaType());
+        } catch (IOException e) {
+            throw new AvatarProcessingException();
+        }
+    }
+
+    public List<AvatarDto> getAllAvatars(int page, int size) {
+        return avatarRepository.findAll(PageRequest.of(page - 1, size)).get()
+                .map(avatarMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

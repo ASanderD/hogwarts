@@ -31,12 +31,12 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public Student findStudent(long id) {
+    public Student findStudent(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException());
     }
 
-    public Student editStudent(long id, Student student) {
+    public Student editStudent(Long id, Student student) {
         return studentRepository.findById(id)
                 .map(oldStudent -> {
                     oldStudent.setName(student.getName());
@@ -47,7 +47,7 @@ public class StudentService {
                 .orElseThrow(() -> new StudentNotFoundException());
     }
 
-    public Student deleteStudent(long id) {
+    public Student deleteStudent(Long id) {
         return studentRepository.findById(id)
                 .map(student -> {
                     studentRepository.deleteById(id);
@@ -60,7 +60,7 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student get(long id) {
+    public Student get(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException());
     }
@@ -75,5 +75,17 @@ public class StudentService {
 
     public Faculty findFaculty(long id) {
         return get(id).getFaculty();
+    }
+
+    public Integer getNumberOfStudents() {
+        return studentRepository.getNumberOfStudents();
+    }
+
+    public Float getAverageAgeOfStudents() {
+        return studentRepository.getAverageAgeOfStudents();
+    }
+
+    public List<Student> getLastFiveStudents() {
+        return studentRepository.getLastFiveStudents();
     }
 }

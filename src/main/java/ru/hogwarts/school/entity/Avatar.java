@@ -1,17 +1,13 @@
 package ru.hogwarts.school.entity;
 
 import jakarta.persistence.*;
-
-import java.util.Arrays;
-import java.util.Objects;
-
 @Entity
 @Table(name = "avatars")
 public class Avatar {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String filePath;
     private long fileSize;
     private String mediaType;
@@ -22,11 +18,11 @@ public class Avatar {
     @OneToOne
     private Student student;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -78,20 +74,4 @@ public class Avatar {
         this.preview = preview;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Avatar avatar = (Avatar) o;
-        return id == avatar.id && fileSize == avatar.fileSize && Objects.equals(filePath, avatar.filePath) && Objects.equals(mediaType, avatar.mediaType) && Arrays.equals(data, avatar.data) && Objects.equals(student, avatar.student);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(id, filePath, fileSize, mediaType, student);
-        result = 31 * result + Arrays.hashCode(data);
-        return result;
-    }
 }
