@@ -5,7 +5,7 @@
 --Также не забудьте добавить таблицам первичные ключи и связать их.
 
 create table cars(
-	id serial primary key,
+	id int primary key,
 	brand varchar(40) not null,
 	model varchar(40) not null,
 	price numeric not null check (price > 0)
@@ -16,6 +16,6 @@ create table persons(
 	name varchar(40) not null,
 	age int2 not null check (age > 18),
 	driver_license boolean default false,
-	cars_id serial references cars(id)
+	cars_id int references cars(id)
 );
 
