@@ -20,7 +20,7 @@ public class StudentController {
 
     @GetMapping("{id}")
     public Student getStudentInfo(@PathVariable Long id) {
-        return studentService.findStudent(id);
+        return studentService.get(id);
     }
 
     @Operation(summary = "Получить всех студентов")
