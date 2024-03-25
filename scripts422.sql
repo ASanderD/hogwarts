@@ -5,7 +5,7 @@
 --Также не забудьте добавить таблицам первичные ключи и связать их.
 
 create table cars(
-	id int primary key,
+	id serial primary key,
 	brand varchar(40) not null,
 	model varchar(40) not null,
 	price numeric not null check (price > 0)
