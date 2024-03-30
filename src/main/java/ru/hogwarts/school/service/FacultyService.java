@@ -10,7 +10,9 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class FacultyService {
@@ -59,7 +61,7 @@ public class FacultyService {
     public Faculty get(long id) {
         logger.debug("Get Faculty by id = {}", id);
         return facultyRepository.findById(id)
-                .orElseThrow(()->new FacultyNotFoundException());
+                .orElseThrow(() -> new FacultyNotFoundException());
     }
 
     public List<Faculty> getFacultyByColor(String color) {
@@ -69,13 +71,32 @@ public class FacultyService {
 
     public List<Faculty> findByNameOrColor(String nameOrColor) {
         logger.debug("Method findByNameOrColor invoked");
-        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor,nameOrColor);
+        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor);
     }
 
     public List<Student> findStudentsByFacultyId(long id) {
         logger.debug("Method findStudentsByFacultyId invoked");
         Faculty faculty = get(id);
         return studentRepository.findByFaculty_Id(faculty.getId());
+    }
+
+    public String longestNameOfFaculty() {
+        return facultyRepository.findAll().stream()
+                .max(Comparator.comparing(faculty -> faculty.getName().length()))
+                .map(faculty -> faculty.getName())
+                .orElseThrow();
+    }
+
+    public Integer getValue() {
+        long startTime = System.currentTimeMillis();
+        Integer sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()
+                .reduce(0, (a, b) -> a + b);
+        long endTime = System.currentTimeMillis();
+        long timeElapsed = endTime - startTime;
+        System.out.println(timeElapsed+"ms");
+        return sum;
     }
 }
 
