@@ -89,13 +89,12 @@ public class FacultyService {
 
     public Integer getValue() {
         long startTime = System.currentTimeMillis();
-        Integer sum = Stream.iterate(1, a -> a + 1)
+        Integer sum = Stream.iterate(1, a -> a + 1).parallel()
                 .limit(1_000_000)
-                .parallel()
                 .reduce(0, (a, b) -> a + b);
         long endTime = System.currentTimeMillis();
         long timeElapsed = endTime - startTime;
-        System.out.println(timeElapsed+"ms");
+        System.out.println(timeElapsed + "ms");
         return sum;
     }
 }
