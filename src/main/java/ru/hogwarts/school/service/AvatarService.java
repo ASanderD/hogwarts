@@ -2,6 +2,8 @@ package ru.hogwarts.school.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
@@ -17,6 +19,7 @@ import ru.hogwarts.school.exceptions.StudentNotFoundException;
 import ru.hogwarts.school.mapper.AvatarMapper;
 import ru.hogwarts.school.repositories.AvatarRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +36,7 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
     private final AvatarMapper avatarMapper;
+    private final Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
     public AvatarService(AvatarRepository avatarRepository,
                          StudentRepository studentRepository,
@@ -56,6 +60,7 @@ public class AvatarService {
     }
 
     public void uploadAvatar(long studentId, MultipartFile avatarFile) {
+        logger.debug("Avatar of student by id = {} upload", studentId);
         try {
             Student student = studentRepository.findById(studentId)
                     .orElseThrow(() -> new StudentNotFoundException());
@@ -78,12 +83,14 @@ public class AvatarService {
     }
 
     public Pair<byte[], String> getAvatarFromDb(long studentId) {
+        logger.debug("Method getAvatarFromDb invoked");
         Avatar avatar = avatarRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new AvatarNotFoundException());
         return Pair.of(avatar.getData(), avatar.getMediaType());
     }
 
     public Pair<byte[], String> getAvatarFromFs(long studentId) {
+        logger.debug("Method getAvatarFromFs invoked");
         try {
             Avatar avatar = avatarRepository.findByStudentId(studentId)
                     .orElseThrow(() -> new AvatarNotFoundException());
@@ -95,6 +102,7 @@ public class AvatarService {
     }
 
     public List<AvatarDto> getAllAvatars(int page, int size) {
+        logger.debug("Method getAllAvatars invoked");
         return avatarRepository.findAll(PageRequest.of(page - 1, size)).get()
                 .map(avatarMapper::toDto)
                 .collect(Collectors.toList());
