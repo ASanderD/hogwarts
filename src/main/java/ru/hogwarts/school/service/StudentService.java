@@ -98,4 +98,20 @@ public class StudentService {
         logger.debug("Get get last five Students successful");
         return studentRepository.getLastFiveStudents();
     }
+
+    public List<String> namesStartsWithG() {
+        logger.debug("Get names Students starts with G  successful");
+        return studentRepository.findAll().stream()
+                .filter(student -> student.getName().toUpperCase().startsWith("Г"))
+                .map(student -> student.getName().toUpperCase())
+                .sorted()
+                .toList();
+    }
+    public Double getAverageAgeOfStudentsWithStream() {
+        logger.debug("Get average age of Students with stream successful");
+        return studentRepository.findAll().stream()
+                .mapToDouble(student -> student.getAge())
+                .average()
+                .orElseThrow();
+    }
 }

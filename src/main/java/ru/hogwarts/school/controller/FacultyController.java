@@ -43,17 +43,27 @@ public class FacultyController {
     }
 
     @GetMapping(params = "color")
-    public List<Faculty> getFacultyByColor(@RequestParam (required = false) String color) {
+    public List<Faculty> getFacultyByColor(@RequestParam(required = false) String color) {
         return facultyService.getFacultyByColor(color);
     }
 
     @GetMapping(params = "nameOrColor")
-    public List<Faculty> findByNameOrColor(@RequestParam (required = false) String nameOrColor) {
+    public List<Faculty> findByNameOrColor(@RequestParam(required = false) String nameOrColor) {
         return facultyService.findByNameOrColor(nameOrColor);
     }
 
     @GetMapping("/{id}/students")
     public List<Student> findStudentsOfFaculty(@PathVariable Long id) {
         return facultyService.findStudentsByFacultyId(id);
+    }
+
+    @GetMapping("longestNameOfFaculty")
+    public String longestNameOfFaculty() {
+        return facultyService.longestNameOfFaculty();
+    }
+
+    @GetMapping("getValue")
+    public Integer getValue() {
+        return facultyService.getValue();
     }
 }
