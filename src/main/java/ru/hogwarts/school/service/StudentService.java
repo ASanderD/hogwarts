@@ -98,4 +98,55 @@ public class StudentService {
         logger.debug("Get get last five Students successful");
         return studentRepository.getLastFiveStudents();
     }
+
+    public List<String> namesStartsWithG() {
+        logger.debug("Get names Students starts with G  successful");
+        return studentRepository.findAll().stream()
+                .filter(student -> student.getName().toUpperCase().startsWith("Г"))
+                .map(student -> student.getName().toUpperCase())
+                .sorted()
+                .toList();
+    }
+
+    public Double getAverageAgeOfStudentsWithStream() {
+        logger.debug("Get average age of Students with stream successful");
+        return studentRepository.findAll().stream()
+                .mapToDouble(student -> student.getAge())
+                .average()
+                .orElseThrow();
+    }
+
+    public void studentsPrintParallel() {
+        List<String> studentsNames = studentRepository.findAll().stream()
+                .map(Student::getName)
+                .limit(6)
+                .toList();
+        logger.info(studentsNames.get(0));
+        logger.info(studentsNames.get(1));
+        new Thread(() -> {
+            logger.info(studentsNames.get(2));
+            logger.info(studentsNames.get(3));
+        }).start();
+        new Thread(() -> {
+            logger.info(studentsNames.get(4));
+            logger.info(studentsNames.get(5));
+        }).start();
+    }
+
+    public void studentsPrintSynchronized() {
+        List<Student> students = studentRepository.findAll().stream()
+                .limit(6)
+                .toList();
+        print(students.get(0), students.get(1));
+        new Thread(() -> {
+            print(students.get(2), students.get(3));
+        }).start();
+        new Thread(() -> {
+            print(students.get(4), students.get(5));
+        }).start();
+    }
+
+    private synchronized void print(Student... students) {
+        Arrays.stream(students).forEach(student -> logger.info(student.getName()));
+    }
 }

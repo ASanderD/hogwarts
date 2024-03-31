@@ -28,9 +28,10 @@ public class StudentController {
     public Collection<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
+
     @Operation(summary = "Получить студентов, входящих в определенный интервал по возрасту")
     @GetMapping(params = {"min", "max"})
-    public Collection<Student> findByAgeBetween(@RequestParam  (required = false) int min, @RequestParam (required = false) int max) {
+    public Collection<Student> findByAgeBetween(@RequestParam(required = false) int min, @RequestParam(required = false) int max) {
         return studentService.findByAgeBetween(min, max);
     }
 
@@ -73,5 +74,25 @@ public class StudentController {
     @GetMapping("/last-five-students")
     public List<Student> getLastFiveStudents() {
         return studentService.getLastFiveStudents();
+    }
+
+    @GetMapping("/names-starts-with-G")
+    public List<String> namesStartsWithG() {
+        return studentService.namesStartsWithG();
+    }
+
+    @GetMapping("getAverageAgeOfStudentsWithStream")
+    public Double getAverageAgeOfStudentsWithStream() {
+        return studentService.getAverageAgeOfStudentsWithStream();
+    }
+
+    @GetMapping("/students/print-parallel")
+    public void studentsPrintParallel() {
+        studentService.studentsPrintParallel();
+    }
+
+    @GetMapping("/students/print-synchronized")
+    public void studentsPrintSynchronized() {
+        studentService.studentsPrintSynchronized();
     }
 }

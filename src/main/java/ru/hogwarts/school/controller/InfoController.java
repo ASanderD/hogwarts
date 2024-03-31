@@ -16,4 +16,8 @@ public class InfoController {
     public int getPort() {
         return infoService.getPort();
     }
+    @GetMapping("getValue")
+    public String getValue() {
+        return infoService.getValue();
+    }
 }

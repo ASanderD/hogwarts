@@ -10,6 +10,7 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -59,7 +60,7 @@ public class FacultyService {
     public Faculty get(long id) {
         logger.debug("Get Faculty by id = {}", id);
         return facultyRepository.findById(id)
-                .orElseThrow(()->new FacultyNotFoundException());
+                .orElseThrow(() -> new FacultyNotFoundException());
     }
 
     public List<Faculty> getFacultyByColor(String color) {
@@ -69,13 +70,20 @@ public class FacultyService {
 
     public List<Faculty> findByNameOrColor(String nameOrColor) {
         logger.debug("Method findByNameOrColor invoked");
-        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor,nameOrColor);
+        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor);
     }
 
     public List<Student> findStudentsByFacultyId(long id) {
         logger.debug("Method findStudentsByFacultyId invoked");
         Faculty faculty = get(id);
         return studentRepository.findByFaculty_Id(faculty.getId());
+    }
+
+    public String longestNameOfFaculty() {
+        return facultyRepository.findAll().stream()
+                .max(Comparator.comparing(faculty -> faculty.getName().length()))
+                .map(faculty -> faculty.getName())
+                .orElseThrow();
     }
 }
 
