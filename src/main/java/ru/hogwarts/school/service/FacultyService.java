@@ -12,7 +12,6 @@ import ru.hogwarts.school.repositories.StudentRepository;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class FacultyService {
@@ -85,17 +84,6 @@ public class FacultyService {
                 .max(Comparator.comparing(faculty -> faculty.getName().length()))
                 .map(faculty -> faculty.getName())
                 .orElseThrow();
-    }
-
-    public Integer getValue() {
-        long startTime = System.currentTimeMillis();
-        Integer sum = Stream.iterate(1, a -> a + 1).parallel()
-                .limit(1_000_000)
-                .reduce(0, (a, b) -> a + b);
-        long endTime = System.currentTimeMillis();
-        long timeElapsed = endTime - startTime;
-        System.out.println(timeElapsed + "ms");
-        return sum;
     }
 }
 
