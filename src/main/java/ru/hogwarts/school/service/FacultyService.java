@@ -3,6 +3,7 @@ package ru.hogwarts.school.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import ru.hogwarts.school.exceptions.FacultyNotFoundException;
 import ru.hogwarts.school.entity.Faculty;
 import ru.hogwarts.school.entity.Student;
@@ -12,6 +13,8 @@ import ru.hogwarts.school.repositories.StudentRepository;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 @Service
@@ -87,15 +90,18 @@ public class FacultyService {
                 .orElseThrow();
     }
 
-    public Integer getValue() {
-        long startTime = System.currentTimeMillis();
-        Integer sum = Stream.iterate(1, a -> a + 1).parallel()
+    public String getValue() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("not modified stream");
+        long sum1 = Stream.iterate(1, a -> a + 1).parallel()
                 .limit(1_000_000)
                 .reduce(0, (a, b) -> a + b);
-        long endTime = System.currentTimeMillis();
-        long timeElapsed = endTime - startTime;
-        System.out.println(timeElapsed + "ms");
-        return sum;
+        stopWatch.stop();
+        stopWatch.start("modified stream");
+        long sum2 = LongStream.rangeClosed(1, 1000000).sum();
+        stopWatch.stop();
+        logger.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+        return "sum1=" + sum1 + "sum2=" + sum2;
     }
 }
 
